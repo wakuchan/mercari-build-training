@@ -1,14 +1,14 @@
-FROM python:3.10-slim-buster
+FROM python:3.10-alpine
+
+RUN addgroup -S mercari && adduser -S trainee -G mercari
 
 WORKDIR /app
+COPY . /app/
+RUN mv db /db
+RUN chown -R trainee:mercari /db
 
-COPY python/requirements.txt python/requirements.txt
+USER trainee
+
 RUN pip install -r python/requirements.txt
 
-COPY . .
-# RUN addgroup -S mercari && adduser -S trainee -G mercari
-# RUN chown -R trainee:mercari /path/to/db
-
-# USER trainee
-
-CMD ["python", "-V", "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD /home/trainee/.local/bin/uvicorn main:app --reload --port 9000
