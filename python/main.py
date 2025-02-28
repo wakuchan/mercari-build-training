@@ -39,7 +39,7 @@ async def get_image(image_name):
         raise HTTPException(status_code=400, detail="Image path does not end with .jpg")
 
     if not image.exists():
-        logger.debug(f"Image not found: {image}")
+        logger.info(f"Image not found: {image}")
         image = images / "default.jpg"
 
     return FileResponse(image)
