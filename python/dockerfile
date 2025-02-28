@@ -1,8 +1,14 @@
-FROM alpine
+FROM python:3.10-slim-buster
 
-RUN addgroup -S mercari && adduser -S trainee -G mercari
+WORKDIR /app
+
+COPY python/requirements.txt python/requirements.txt
+RUN pip install -r python/requirements.txt
+
+COPY . .
+# RUN addgroup -S mercari && adduser -S trainee -G mercari
 # RUN chown -R trainee:mercari /path/to/db
 
-USER trainee
+# USER trainee
 
-CMD ["python", "-V"]
+CMD ["python", "-V", "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
