@@ -176,16 +176,38 @@ def root():
 
 # For STEP 9
 @app.post("/items")
-def add_item(name: str = Form(...), category: str = Form(...), image: UploadFile = File(...)):
+async def add_item(name: str = Form(...), category: str = Form(...), image: UploadFile = File(...)):
     logger.info(f"Receive item: {name}")
-    hash_image = sha256_hash_step9(image) + ".jpg"
-    category_id = get_category_id(category)
-    logger.info(f"category id: {category_id}")
 
-    # Using DataBase
-    new_id = insert_item_to_db(name, category_id, hash_image)
-    logger.info(f"inserted id: {new_id}")
-    return {"message": f"item received: {name}"}
+    try:
+        # Read file contents as bytes
+        file_contents = await image.read()
+
+        if not isinstance(file_contents, bytes):
+            raise TypeError("File contents must be in bytes format")
+
+        # Compute hash of the image's content
+        hash_image = sha256_hash_step9(file_contents) + ".jpg"
+        logger.info(f"Image hash: {hash_image}")
+
+        file_path = images/ hash_image
+
+        # Save the file to the local system
+        with open(file_path, "wb") as file:
+            file.write(file_contents)
+
+        # Resolve category ID
+        category_id = get_category_id(category)
+        logger.info(f"Category ID: {category_id}")
+
+        # Insert into database
+        new_id = insert_item_to_db(name, category_id, hash_image)
+        logger.info(f"Inserted ID: {new_id}")
+
+        return {"message": f"Item received: {name}"}
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @app.get("/items")
 def get_items():
