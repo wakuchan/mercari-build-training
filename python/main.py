@@ -8,6 +8,8 @@ import sqlite3
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from typing import Dict, List
+from PIL import Image, UnidentifiedImageError
+
 
 
 # Define the path to the images & sqlite3 database
@@ -49,6 +51,14 @@ def get_db():
 import hashlib
 def hash_image(image_file: UploadFile) -> str:
     try:
+        # Validate image type
+        try:
+            with Image.open(image_file.file) as img:
+                if img.format != 'JPEG':  # Check if the image format is JPEG
+                    raise ValueError("Uploaded file is not a JPEG image.")
+        except UnidentifiedImageError:
+            raise ValueError("The file doesn't appear to be an image.")
+
         # Read image
         image = image_file.file.read()
         hash_value = hashlib.sha256(image).hexdigest()
