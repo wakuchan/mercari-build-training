@@ -1,4 +1,4 @@
-# STEP5: Run the application in a virtual environment
+# STEP7: Run the application in a virtual environment
 
 In this step, we will learn how to use Docker.
 
@@ -88,11 +88,11 @@ Check that you can now see `mercari-build-training/app` in the list of images.
 * [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
 
 ## 5. Modity Dockerfile
-**Run the docker image you built in STEP4-4, and check if the following error shows up.**
+**Run the docker image you built in STEP7-4, and check if the following error shows up.**
 
 ```
 docker: Error response from daemon: OCI runtime create failed: container_linux.go:380: starting container process caused: exec: "python": executable file not found in $PATH: unknown.
-ERRO[0000] error waiting for container: context canceled
+ERROR[0000] error waiting for container: context canceled 
 ```
 
 `"python"` part will be replaced with `"go"` if you're using Go.
@@ -109,7 +109,7 @@ Run the image with the modified `Dockerfile`, check if the same message is displ
 
 ## 6. Run the listing API on Docker
 
-The environment within the docker image should be the same as STEP2-2 after STEP4-5.
+The environment within the docker image should be the same as STEP2-2 after STEP7-5.
 
 **Modify `Dockerfile` to copy necessary files and install dependencies such that you can run the listing API on docker**
 
@@ -131,10 +131,7 @@ $ curl \
   -F 'image=@images/local_image.jpg'
 ```
 
-If the correct result is returned, it is successful. Let's also verify if other APIs implemented in STEP3 can be accessed correctly.
-
-To run the product API, it is necessary to include not only the Go or Python programs but also the db files in the Docker image.
-Note that you need to execute the Docker command under `mercari-build-training/`.
+If the correct result is returned, it is successful. Let's also verify if other APIs implemented in STEP4 can be accessed correctly.
 
 ---
 **:beginner: Points**
@@ -151,4 +148,4 @@ Make sure you understand the following concepts
 
 ### Next
 
-[STEP6: Build Docker image using CI](06-ci.en.md)
+[STEP8: Build Docker image using CI](./08-ci.en.md)

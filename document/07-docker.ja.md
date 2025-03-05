@@ -1,4 +1,4 @@
-# STEP5: 仮想環境でアプリを動かす
+# STEP7: 仮想環境でアプリを動かす
 
 このステップでは docker の使い方を学びます。
 
@@ -88,11 +88,11 @@ docker はホスト上に存在しないイメージを使う際には、自動�
 * [Dockerfile リファレンス](https://docs.docker.jp/engine/reference/builder.html)
 
 ## 5. Dockerfile を 変更する
-**STEP4-4 で Build した Image を実行し、次のようなerrorが出ることを確認しましょう。**
+**STEP7-4 で Build した Image を実行し、次のようなerrorが出ることを確認しましょう。**
 
 ```
 docker: Error response from daemon: OCI runtime create failed: container_linux.go:380: starting container process caused: exec: "python": executable file not found in $PATH: unknown.
-ERRO[0000] error waiting for container: context canceled 
+ERROR[0000] error waiting for container: context canceled 
 ```
 Goの場合は、上のエラーメッセージの`"python"`の部分が`"go"`になります。
 
@@ -108,7 +108,7 @@ Goの場合は、上のエラーメッセージの`"python"`の部分が`"go"`�
 
 ## 6. 出品 API を docker 上で動かす
 
-STEP4-5 までで docker image の中は STEP2-2 と同じ状態になっています。
+STEP7-5 までで docker image の中は STEP2-2 と同じ状態になっています。
 
 **`Dockerfile`を変更し、必要なファイルをコピーしたり依存ライブラリをインストールしたりして, docker image 上で 出品 API が動くようにしましょう。**
 
@@ -127,10 +127,7 @@ $ curl \
   -F 'image=@images/local_image.jpg'
 ```
 
-の結果が正しく返ってくれば成功です。STEP3で実装した他のAPIに対しても正しく叩けるか確認してみましょう。
-
-出品 API を動かすためには、go や　python のプログラムに加えて db のファイルも docker image の中に含める必要があります。
-そのためには `mercari-build-training/` 以下で docker コマンドを実行する必要があることに注意しましょう。
+の結果が正しく返ってくれば成功です。STEP4で実装した他のAPIに対しても正しく叩けるか確認してみましょう。
 
 ---
 **:beginner: Point**
@@ -147,4 +144,4 @@ $ curl \
 
 ### Next
 
-[STEP6: CIを使ってDocker imageをBuildする](06-ci.ja.md)
+[STEP8: CIを使ってDocker imageをBuildする](./08-ci.ja.md)

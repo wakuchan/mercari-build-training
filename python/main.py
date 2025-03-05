@@ -7,8 +7,41 @@ import sqlite3
 from fastapi import FastAPI, Form, HTTPException, File, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+import sqlite3
+from pydantic import BaseModel
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+# Define the path to the images & sqlite3 database
+images = pathlib.Path(__file__).parent.resolve() / "images"
+db = pathlib.Path(__file__).parent.resolve() / "db" / "mercari.sqlite3"
+
+
+def get_db():
+    if not db.exists():
+        yield
+
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row  # Return rows as dictionaries
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+
+# STEP 5-1: set up the database connection
+def setup_database():
+    pass
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    setup_database()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
 logger = logging.getLogger("uvicorn")
 logger.level = logging.INFO
 images = pathlib.Path(__file__).parent.resolve() / "images"
@@ -153,9 +186,8 @@ def get_category_id(category: str):
     
     return id
 
-@app.get("/")
-def root():
-    return {"message": "Hello, world!"}
+class HelloResponse(BaseModel):
+    message: str
 
 # For STEP 4
 # @app.post("/items")
@@ -175,9 +207,14 @@ def root():
 #     return {"message": f"item received: {name}"}
 
 # For STEP 9
-@app.post("/items")
-async def add_item(name: str = Form(...), category: str = Form(...), image: UploadFile = File(...)):
-    logger.info(f"Receive item: {name}")
+# @app.post("/items")
+# async def add_item(name: str = Form(...), category: str = Form(...), image: UploadFile = File(...)):
+#     logger.info(f"Receive item: {name}")
+
+@app.get("/", response_model=HelloResponse)
+def hello():
+    return HelloResponse(**{"message": "Hello, world!"})
+
 
     try:
         # Read file contents as bytes
@@ -223,6 +260,24 @@ def get_item_by_id(item_id):
     item = get_item_by_id_from_database(item_id_int)
     return item
 
+class AddItemResponse(BaseModel):
+    message: str
+
+
+# add_item is a handler to add a new item for POST /items .
+@app.post("/items", response_model=AddItemResponse)
+def add_item(
+    name: str = Form(...),
+    db: sqlite3.Connection = Depends(get_db),
+):
+    if not name:
+        raise HTTPException(status_code=400, detail="name is required")
+
+    insert_item(Item(name=name))
+    return AddItemResponse(**{"message": f"item received: {name}"})
+
+
+# get_image is a handler to return an image for GET /images/{filename} .
 @app.get("/image/{image_name}")
 async def get_image(image_name):
     # Create image path
@@ -241,3 +296,11 @@ async def get_image(image_name):
 def search_keyword(keyword: str = Form(...)):
     search_result = search_items(keyword)
     return search_result
+
+class Item(BaseModel):
+    name: str
+
+
+def insert_item(item: Item):
+    # STEP 4-2: add an implementation to store an item
+    pass

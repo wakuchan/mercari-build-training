@@ -1,4 +1,4 @@
-# STEP7: Implement a simple Mercari webapp as frontend
+# STEP9: Implement a simple Mercari webapp as frontend
 
 ## 1. Build local environment
 
@@ -24,7 +24,7 @@ After launching the web application with the following command, check your web a
 npm start
 ```
 
-Run the backend servers in Python/Go as described in Step3.
+Run the backend servers in Python/Go as described in STEP4.
 This simple web application allows you to do two things
 
 - Add a new item (Listing)
@@ -38,7 +38,7 @@ These functionalities are carved out as components called `src/components/Listin
 
 Use the listing form to add a new item. In this screen, you can input name, category and an image for a new item.
 
-If your API from STEP3 only accepts name and category, modify `typescript/simple-mercari-web/src/components/Listing.tsx` and delete the image field.
+If your API from STEP4 only accepts name and category, modify `typescript/simple-mercari-web/src/components/Listing.tsx` and delete the image field.
 
 ## (Optional) Task 2. Show item images
 
@@ -131,4 +131,4 @@ When selecting a framework, it is good to consider the following perspectives:
 
 ## Next
 
-[STEP8: Run frontend and API using docker-compose](08-docker-compose.en.md)
+[STEP10: Run frontend and API using docker-compose](./10-docker-compose.en.md)

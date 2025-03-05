@@ -6,15 +6,16 @@ Choose either Python or Go and build your local environment.
 ## Building Python environment
 
 ### 1. Install Python
-* If your local version is below Python3.8, install Python3.10.
-* If you have Python3.8 or above, you can skip the installation step.
+* If your local version is below Python3.9, install Python3.13.
+* If you have Python3.9 or above, you can skip the installation step.
 
 ### 2. Check your Python version
 
 * Check if the Python is added to your PATH (usable as commands on your terminal) with the following command.
 
 ```shell
-$ python -V
+$ python3 -V
+# Or $ python -V
 ```
 
 If the version does not correspond to the Python version you installed, double check your installation as it is not **added to your PATH**.
@@ -32,17 +33,20 @@ You can install the dependencies by running the following command.
 $ cd python
 
 # Create virtual environment for this application
-$ python -m venv .venv
-$ source .venv/bin/activate
-# When you use non-UNIX os, the activation method is different.
+$ python3 -m venv .venv　
+
+# Activate virtual environment
+$ source .venv/bin/activate # for Mac or Unix user
+$ .venv/Scripts/activate # for Windows user
 
 # Install required library
+$ pip install --upgrade pip setuptools wheel
 $ pip install -r requirements.txt
 ```
 
 If you added a library, make sure you add it to `requirements.txt`.
 
-`python -m venv .venv` is a command to create a Python virtual environment.
+`python3 -m venv .venv` is a command to create a Python virtual environment.
 A virtual environment is a way to create a project-specific Python environment.
 Using a virtual environment allows you to manage necessary packages separately for each project so that you can avoid dependency conflicts between different projects.
 Once the virtual environment is created, it must be activated by the `source .venv/bin/activate` command.
@@ -62,8 +66,8 @@ If successful, you can access the local host `http://127.0.0.1:9000` on our brow
 
 ## Building Go environment
 ### 1. Install Go
-* If your local version is below Go1.20, install Go1.21.
-* If you have Go1.20 or above, you can skip the installation step.
+* If your local version is below Go1.24, install Go1.24.
+* If you have Go1.24 or above, you can skip the installation step.
 
 Download it from [this link](https://go.dev/dl/)!  
 ※ If you are using a Mac and are unsure whether to download the `x86-64` or `ARM64` version, click on the Apple logo at the top left corner > select "About This Mac". If the chip is listed as "Apple" choose `ARM64`; if it's "Intel" select `x86-64`.
@@ -105,10 +109,11 @@ Understand the role of `go.mod` and the commands around it referring to this [do
 ### 4. Run the Go app
 
 ```shell
-$ go run app/main.go
+$ go run cmd/api/main.go
 ```
 
 If successful, you can access the local host `http://127.0.0.1:9000` on our browser and you will see`{"message": "Hello, world!"}`.
+To stop the server, press Ctrl+C.
 
 ---
 **:beginner: Points**
@@ -132,4 +137,4 @@ The following resources are useful to dive deeper into building environments and
 
 ### Next
 
-[STEP3: Make a listing API](03-api.en.md)
+[STEP3: Algorithms and Data Structures](./03-algorithm-and-data-structure.en.md)

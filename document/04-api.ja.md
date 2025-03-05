@@ -1,4 +1,4 @@
-# STEP3: 出品APIを作る
+# STEP4: 出品APIを作る
 
 ## 1. APIを呼び出す
 
@@ -25,17 +25,22 @@ cURLが利用されているかは、以下のコマンドで確認できます�
 $ curl --version
 ```
 
-このコマンドを実行後にバージョンが表示されればcURLはインストールされているので、本節はスキップしてください。仮にインストールされていない場合は、各自調べてインストールしてください。
+このコマンドを実行後にバージョンが表示されればcURLはインストールされています。インストールされていない場合は、各自調べてインストールしてください。
 
 ### GETリクエストの送信
 
 cURLを用いて、前節で立ち上げたAPIサーバに対してGETリクエストを送ってみましょう。
+サーバーを起動していない場合は、以下のコマンドを実行してください。
 
-cURLでリクエストを送る前に、HTTPブラウザで `http://127.0.0.1:9000` にアクセスしたときに、 `{"message": "Hello, world!"}` が表示されることを確認してください。仮に表示されない場合は、前章の4節: アプリにアクセスするを参照してください([Python](./02-local-env.ja.md#4-アプリにアクセスする), [Go](./02-local-env.ja.md#4-アプリにアクセスする-1))。
+| Python                                                                                       | Go                                                                            |
+|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Move to python folder before running the command <br>`uvicorn main:app --reload --port 9000` | Move to python folder before running the command <br>`go run cmd/api/main.go` |
+
+cURLでリクエストを送る前に、HTTPブラウザで `http://127.0.0.1:9000` にアクセスしたときに、 `{"message": "Hello, world!"}` が表示されることを確認してください。仮に表示されない場合は、STEP2-4: アプリにアクセスするを参照してください([Python](./02-local-env.ja.md#4-アプリにアクセスする), [Go](./02-local-env.ja.md#4-アプリにアクセスする-1))。
 
 さて、実際にcURLコマンドを用いてリクエストを送ってみましょう。ここではGETリクエストとPOSTリクエストを送信します。
 
-新しいターミナルを開き、以下のコマンドを実行してください。
+**サーバーをたてたターミナルはそのままで、 新しいターミナルを開いて**以下のコマンドを実行してください。
 
 ```shell
 $ curl -X GET 'http://127.0.0.1:9000'
@@ -52,9 +57,9 @@ $ curl -X POST 'http://127.0.0.1:9000/items'
 ```
 
 このエンドポイントは、コールに成功すると`{"message": "item received: <name>"}`
-というレスポンスが返ってくることが期待されています。しかし、ここでは異なるレスポンスが返ってくるはずです。
+というレスポンスが返ってくることが期待されています。しかし、ここでは異なるレスポンスが返ってきます。
 
-コマンドを以下のように修正することで、`{"message": "item received: jacket"}`が返ってきますが、なぜそのような結果になるのか調べてみましょう。
+コマンドを以下のように修正することで、`{"message": "item received: jacket"}`が返ってきますが、なぜそのような結果になるのか、`python/main.py`もしくは`go/app/server.go`のファイルを開いて調べてみましょう。
 
 ```shell
 $ curl \
@@ -102,6 +107,61 @@ $ curl \
   ]
 }
 ```
+
+### Goの永続化に関する補足
+
+Go側のコードは以下のような実装をしています。この場合、 `AddItem` メソッド内で呼ばれる `Insert()` メソッドは `itemRepository` の `Insert()` メソッドです。
+
+```go
+type Handlers struct {
+	imgDirPath string
+	itemRepo   ItemRepository
+}
+
+func (s *Handlers) AddItem(w http.ResponseWriter, r *http.Request) {
+  // (略)
+  err = s.itemRepo.Insert(ctx, item)
+  // (略)
+}
+
+type ItemRepository interface {
+	Insert(ctx context.Context, item *Item) error
+}
+
+func NewItemRepository() ItemRepository {
+	return &itemRepository{fileName: "items.json"}
+}
+
+type itemRepository struct {
+	fileName string
+}
+
+func (i *itemRepository) Insert(ctx context.Context, item *Item) error {
+	// STEP 4-2: add an implementation to store an item
+
+	return nil
+}
+
+func (s Server) Run() int {
+  // (略)
+  itemRepo := NewItemRepository()
+	h := &Handlers{imgDirPath: s.ImageDirPath, itemRepo: itemRepo}
+  // (略)
+}
+```
+
+ここで、 `s.itemRepo` は `itemRepository` と呼ばれる `struct` ではなく、`ItemRepository` と呼ばれる `interface` であることに気づいたでしょうか？
+
+この `interface` とは、メソッドの集合を表現した型です。今回は `Insert` と呼ばれるメソッドのみを持ちます。したがって、 `Insert` というメソッドを持つ任意の構造体をこの `ItemRepository` にセットすることが可能です。今回は、`Run` メソッドの中で、`itemRepo` に `itemRepository` 構造体がセットされているため、`itemRepository` の `Insert` メソッドが呼び出されます。
+
+では、なぜこのような抽象化が必要なのでしょうか？
+理由はいくつかありますが、ここでは永続化の方法を容易に置き換えられることがメリットの1つです。今回は、JSONを永続化の方法として選択していますが、データベースやテスト用の実装をここで置き換えることが容易になります。この時に、コード上は呼び出し側は裏側の実装がどうなっているかを意識せずに呼び出すことが出来るため、コードの大きな改変が不要になります。
+
+このような抽象化の概念は、以下のUNIX哲学の本等でも触れられているので、興味があれば読んでみてください。
+
+**:book: Reference**
+
+* (JA)[book - UNIXという考え方: その設計思想と哲学](https://www.amazon.co.jp/dp/4274064069)
 
 ## 3. 商品一覧を取得する
 
@@ -158,6 +218,7 @@ $ curl \
 
 本節のゴールは、1商品の詳細情報を取得できるエンドポイントを作成することです。
 そのために、 `GET /items/<item_id>` というエンドポイントを作成します。
+`<item_id>` は何個目に登録した商品かを表すIDです。jsonファイルからitem一覧を呼び出して、`item_id` 番目のitemの情報を返しましょう。
 
 ```shell
 $ curl -X GET 'http://127.0.0.1:9000/items/1'
@@ -192,4 +253,4 @@ Image not found: <image path>
 
 ### Next
 
-[STEP4: データベース](04-database.ja.md)
+[STEP5: データベース](./05-database.ja.md)

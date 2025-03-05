@@ -6,37 +6,46 @@ PythonかGoから1つの言語を選び、環境を作りましょう。
 ## Pythonの環境を作る
 
 ### 1. Pythonをインストールする
-* Python3.8以上がインストールされていない場合、Python3.10をインストールします
-* すでに3.8以上がインストール済みの方はskipして問題ないです
+* Python3.9以上がインストールされていない場合、Python3.13をインストールします
+* すでに3.9以上がインストール済みの方はskipして問題ないです
 
 ### 2. Pythonのバージョンをチェックする
 
 * インストールしたPythonにパスが通っている(=ターミナルから使える状態)か確認します。
 
 ```shell
-$ python -V
+$ python3 -V 
+# もしくは $ python -V
 ```
 
 表示されるPythonのバージョンがインストールしたものではなければ、**パスが通っていない**状態なので確認してください。
 
 **:book: Reference**
 
-* [PATHを通すとは？- 初心者でも分かる解説](https://hara-chan.com/it/programming/environment-variable-path/)
+* [「PATHが通っている」とはどういう状態か?](https://zenn.dev/d0ne1s/articles/1f435463551ac2)
+* Windowsの方向け [【環境構築 入門】PATHの通し方 – Windows11, M1 Mac 対応 –](https://www.kikagaku.co.jp/kikagaku-blog/path/)
 
 ### 3. 依存ライブラリをインストールする
 
 Pythonでは、`requirements.txt`というファイルに依存しているライブラリの一覧を記載します。
 以下のコマンドを実行することで、依存ライブラリをまとめてインストールすることができます。
 
+### Unix or Mac
 ```shell
 $ cd python
 
 # 仮想環境をつくる
-$ python -m venv .venv
-$ source .venv/bin/activate
-# Unixを利用していない場合コマンドが違うことがあります
+$ python3 -m venv .venv
+
+# 仮想環境をアクティベートする  
+$ source .venv/bin/activate  # Unix / Macの場合
+$ .venv/Scripts/activate    # windowsの場合
+
+# 今回使うPythonのパスを確認する。
+$ which python
 
 # 必要なライブラリをインストールする
+$ pip install --upgrade pip setuptools wheel
 $ pip install -r requirements.txt
 ```
 
@@ -63,8 +72,8 @@ $ uvicorn main:app --reload --port 9000
 
 ## Goの環境を作る
 ### 1. Goをインストールする
-* Go1.20以上がインストールされていない場合、Go1.21をインストールします
-* すでに1.20以上がインストール済みの方はskipして問題ないです
+* Go1.24以上がインストールされていない場合、Go1.24をインストールします
+* すでに1.24以上がインストール済みの方はskipして問題ないです
 
 https://go.dev/dl/ このリンクからダウンロードしてください。  
 ※ Macの方で`x86-64`と`ARM64`どちらをダウンロードすればいいかわからない場合は、左上の🍎マーク > 「このMacについて」を開き、チップが「Apple」になっていたら`ARM64`を「Intel」であれば`x86-64`を選択してください。
@@ -106,11 +115,12 @@ $ go mod tidy
 ### 4. アプリにアクセスする
 
 ```shell
-$ go run app/main.go
+$ go run cmd/api/main.go
 ```
 
 起動に成功したら、 ブラウザで `http://127.0.0.1:9000` にアクセスして、`{"message": "Hello, world!"}`
 が表示されれば成功です。
+サーバーをストップする場合はCtrl+Cを押してください。
 
 ---
 **:beginner: Point**
@@ -134,4 +144,4 @@ $ go run app/main.go
 ---
 ### Next
 
-[STEP3: 出品APIを作る](03-api.ja.md)
+[STEP3: アルゴリズムとデータ構造](./03-algorithm-and-data-structure.ja.md)
