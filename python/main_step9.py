@@ -65,8 +65,6 @@ def hash_image(image_file: UploadFile) -> str:
         hashed_image_name = f"{hash_value}.jpg"
         hashed_image_path = images / hashed_image_name
         # Save image with hashed value as image name
-        # with open(hashed_image_path, 'wb') as f:
-        #     f.write(image)
         PIL_image.save(hashed_image_path, "JPEG")
         return hashed_image_name
     
