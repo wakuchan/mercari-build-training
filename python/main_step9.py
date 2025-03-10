@@ -59,7 +59,7 @@ def hash_image(image_file: UploadFile) -> str:
         except UnidentifiedImageError:
             raise ValueError("The file doesn't appear to be an image.")
 
-        # Read image
+         # Read image
         PIL_image = Image.open(image_file.file)
         hash_value = hashlib.sha256(PIL_image.tobytes()).hexdigest()
         hashed_image_name = f"{hash_value}.jpg"

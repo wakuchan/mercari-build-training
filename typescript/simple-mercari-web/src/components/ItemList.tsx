@@ -29,12 +29,15 @@ export const ItemList = ({ reload, onLoadCompleted }: Prop) => {
   }, [reload, onLoadCompleted]);
 
   return (
-    <div>
+    <div className="wrapper">
       {items?.map((item) => {
+        const imageUrl = `http://localhost:9000/image/${item.id}.jpg`;
         return (
           <div key={item.id} className="ItemList">
             {/* TODO: Task 2: Show item images */}
-            <img src={PLACEHOLDER_IMAGE} />
+            <img src={imageUrl} alt={`Image for ${item.name}`}
+            onError={(e) => e.currentTarget.src = PLACEHOLDER_IMAGE}
+            className="item-image" />
             <p>
               <span>Name: {item.name}</span>
               <br />

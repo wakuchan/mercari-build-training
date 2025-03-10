@@ -8,8 +8,6 @@ import sqlite3
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from typing import Dict, List
-from PIL import Image, UnidentifiedImageError
-
 
 
 # Define the path to the images & sqlite3 database
@@ -51,21 +49,14 @@ def get_db():
 import hashlib
 def hash_image(image_file: UploadFile) -> str:
     try:
-        # Validate image type
-        try:
-            with Image.open(image_file.file) as img:
-                if img.format != 'JPEG':  # Check if the image format is JPEG
-                    raise ValueError("Uploaded file is not a JPEG image.")
-        except UnidentifiedImageError:
-            raise ValueError("The file doesn't appear to be an image.")
-
         # Read image
-        PIL_image = Image.open(image_file.file)
-        hash_value = hashlib.sha256(PIL_image.tobytes()).hexdigest()
+        image = image_file.file.read()
+        hash_value = hashlib.sha256(image).hexdigest()
         hashed_image_name = f"{hash_value}.jpg"
         hashed_image_path = images / hashed_image_name
         # Save image with hashed value as image name
-        PIL_image.save(hashed_image_path, "JPEG")
+        with open(hashed_image_path, 'wb') as f:
+            f.write(image)
         return hashed_image_name
     
     except Exception as e:
@@ -205,14 +196,14 @@ def get_items_from_database(db: sqlite3.Connection):
     cursor = db.cursor()
     # Query the Items table
     query = """
-    SELECT items.id, items.name, categories.name AS category, image_name 
+    SELECT items.name, categories.name AS category, image_name 
     FROM items 
     JOIN categories
     ON category_id = categories.id
     """
     cursor.execute(query)
     rows = cursor.fetchall()
-    items_list = [{"id": id, "name": name, "category": category, "image_name": image_name} for id, name, category, image_name in rows]
+    items_list = [{"name": name, "category": category, "image_name": image_name} for name, category, image_name in rows]
     result = {"items": items_list}
     cursor.close()
     
